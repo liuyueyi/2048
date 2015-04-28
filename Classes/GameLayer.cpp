@@ -254,6 +254,7 @@ void GameLayer::onTouchEnded(Touch* touch, Event* event)
 
 bool GameLayer::ifOver()
 {
+	//当存在空格或有两个相邻的grid数字相同，则表示游戏没有结束
 	for(int row = 0; row < 3; row++)
 	{
 		for(int column = 0; column < 3; column++)
