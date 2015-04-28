@@ -43,27 +43,5 @@ bool GameScene::init()
 	setLayer->setVisible(false);
 	this->addChild(setLayer);
 
-	/*auto cl = LayerColor::create(Color4B(120, 120, 120, 255), 100, 100);
-	cl->setPosition(100, 100);
-	auto a1 = FadeOut::create(1);
-	auto a2 = FadeIn::create(1);
-	auto a3 = RepeatForever::create(Sequence::create(a1, a2, nullptr));
-	cl->runAction(a3);
-	this->addChild(cl);
-	
-	auto label = Label::createWithSystemFont("click me", "Arial", 30);
-	label->setPosition(160, 200);
-	this->addChild(label);
-	auto listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [label](Touch* t, Event* s){
-		auto rec = label->getBoundingBox();
-		log("clicked");
-		if(label->getBoundingBox().containsPoint(t->getLocation())){
-			log("rec is: %f %f %f %f\n", rec.getMaxX(), rec.getMaxY(), rec.getMinX(), rec.getMinY());
-			return true;
-		}
-		return false;
-	};
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, label);*/
 	return true;
 }

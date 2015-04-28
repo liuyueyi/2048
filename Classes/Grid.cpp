@@ -77,6 +77,9 @@ void Grid::loadMap()
 
 bool Grid::compareTo(Grid* grid)
 {
+	if(grid == nullptr)
+		return false;
+
 	return _value == grid->getScoreValue();
 }
 

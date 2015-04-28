@@ -63,6 +63,7 @@ void GameLayer::initGrids()
 
 void GameLayer::loadGrids(int type)
 {
+	_isOver = false;
 	auto f = UserDefault::getInstance();
 	if(!f->isXMLFileExist() || !f->getBoolForKey(Value(type).asString().append("exits").c_str(), false))
 		return initGrids();
@@ -113,6 +114,7 @@ void GameLayer::clearLastGrids()
 }
 void GameLayer::restartGame()
 {
+	_isOver = false;
 	GameTool::getInstance()->resetScore();
 	clearGrids();
 	clearLastGrids();
@@ -202,6 +204,14 @@ void GameLayer::onExit()
 
 bool GameLayer::onTouchBegan(Touch* touch, Event* event)
 {
+	if(_isOver)//if game over, then restart the game
+	{
+		auto fail = this->getChildByName("fail");
+		fail->setVisible(false);
+		restartGame();
+		return false;
+	}
+
 	_begin = touch->getLocation();
 	auto rect = Rect(this->getPosition().x, this->getPosition().y, this->getContentSize().width, this->getContentSize().height);
 	return rect.containsPoint(_begin); // means only touch the game box, then response
@@ -239,7 +249,44 @@ void GameLayer::onTouchEnded(Touch* touch, Event* event)
 		randGenGrid();
 
 	// judge if game over
+	_isOver = ifOver();
+}
 
+bool GameLayer::ifOver()
+{
+	for(int row = 0; row < 3; row++)
+	{
+		for(int column = 0; column < 3; column++)
+		{
+			if(_grids[row][column] == nullptr)
+				return false;
+
+			if(_grids[row][column]->compareTo(_grids[row][column+1]) || _grids[row][column]->compareTo(_grids[row+1][column]))
+				return false;
+		}
+	}
+
+	for(int column = 0; column < 3; column++)
+		if(_grids[3][column] == nullptr || _grids[3][column]->compareTo(_grids[3][column+1]))
+			return false;
+
+	for(int row = 0; row < 3; row++)
+		if(_grids[row][3] == nullptr || _grids[row][3]->compareTo(_grids[row+1][3]))
+			return false;
+
+	// game over and show the fail scene
+	auto fail = this->getChildByName("fail");
+	if(fail == nullptr)
+	{
+		fail = LayerColor::create(Color4B(144, 144, 144, 144), 300, 300);
+		auto flabel = Label::create("Game Over!", "Bold", 50);
+		flabel->setPosition(150, 150);
+		fail->addChild(flabel);
+		fail->setName("fail");
+		this->addChild(fail);
+	}
+	fail->setVisible(true);
+	return true;
 }
 
 #define ERRORINDEX -1
