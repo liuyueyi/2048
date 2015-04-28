@@ -50,7 +50,7 @@ bool GameScene::init()
 	auto a3 = RepeatForever::create(Sequence::create(a1, a2, nullptr));
 	cl->runAction(a3);
 	this->addChild(cl);
-
+	
 	auto label = Label::createWithSystemFont("click me", "Arial", 30);
 	label->setPosition(160, 200);
 	this->addChild(label);
