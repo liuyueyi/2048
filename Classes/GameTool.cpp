@@ -1,7 +1,7 @@
 #include "GameTool.h"
 #include "DataConf.h"
 
-static GameTool* _instance;
+GameTool* GameTool::_instance=nullptr;
 GameTool* GameTool::getInstance()
 {
 	if(_instance==nullptr)

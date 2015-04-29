@@ -2,7 +2,7 @@
 #include "GameTool.h"
 #include "DataConf.h"
 
-static GameLayer* _instance;
+GameLayer* GameLayer::_instance = nullptr;
 int isMove = 0; // 大于0时，表示移动了当前的数字布局，因此需要自动保存上一次的布局结果, 在移动完毕后在RandGenGrid中进行自动清0
 GameLayer* GameLayer::getInstance()
 {

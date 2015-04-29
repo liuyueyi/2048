@@ -119,7 +119,7 @@ void Grid::moveAndUpdate()
 	auto action01 = ScaleTo::create(0.1f, 1.1f);
 	auto action02 = ScaleTo::create(0.1f, 1);
 	//auto action03 = DelayTime::create(0.1f);
-	auto action03 = FadeIn::create(0.1f);
+	auto action03 = FadeIn::create(0.2f);
 	auto action04 = Sequence::create(action03, CallFunc::create([&]{
 		//log("add child");
 		this->setVisible(true);

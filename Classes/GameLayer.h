@@ -51,6 +51,7 @@ private:
 	Vec2 _begin;
 	Vec2 _end;
 	bool _isOver;
+	static GameLayer* _instance;
 };
 
 enum Direction

@@ -6,7 +6,7 @@
 
 USING_NS_CC;
 
-static GameMenuLayer* _instance;
+GameMenuLayer* GameMenuLayer::_instance = nullptr;
 GameMenuLayer* GameMenuLayer::getInstance()
 {
 	if(_instance == nullptr)

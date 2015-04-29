@@ -12,4 +12,6 @@ private:
 	void resetGameFun(cocos2d::Ref* ref);
 	void undoGameFun(cocos2d::Ref* ref);
 	void setGameFun(cocos2d::Ref* ref);
+
+	static GameMenuLayer* _instance;
 };

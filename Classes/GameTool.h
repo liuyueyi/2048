@@ -28,4 +28,5 @@ private:
 
 	int _score;
 	int _bestScore;
+	static GameTool* _instance;
 };
