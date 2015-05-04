@@ -66,11 +66,11 @@ void Grid::loadMap()
 
 	for(int i = 0; i<16; i++)
 	{
-		if(type == 0)
+		if(type == StateType::SOLDIER)
 			map[i] = Grid::G2U(guan[i].c_str());
-		else if(type == 1)
+		else if(type == StateType::CLASSIC)
 			map[i] = num[i];
-		else
+		else if(type == StateType::COLOR)
 			map[i] = "";
 	}
 }
@@ -101,6 +101,20 @@ void Grid::setLocalPosition(int row, int column)
 	this->setPosition(column*73 + 8, row*73 + 8);
 }
 
+void Grid::initAction()
+{
+	auto a1 = ScaleTo::create(0.3f, 1);
+	auto a2 = FadeIn::create(1);
+	auto a3 = Spawn::create(a1, a2, nullptr);
+	setScale(0);
+	runAction(a3);
+}
+
+void Grid::moveOnly(int targetRow, int targetColumn)
+{
+	runAction(MoveTo::create(0.2f, Vec2(73 * targetColumn + 8, 73 * targetRow + 8)));
+}
+
 void Grid::moveAndClear(int targetRow, int targetColumn)
 {
 	auto a1 = MoveTo::create(0.2f, Vec2(73 * targetColumn + 8, 73 * targetRow + 8));
@@ -118,7 +132,6 @@ void Grid::moveAndUpdate()
 	this->setVisible(false);
 	auto action01 = ScaleTo::create(0.1f, 1.1f);
 	auto action02 = ScaleTo::create(0.1f, 1);
-	//auto action03 = DelayTime::create(0.1f);
 	auto action03 = FadeIn::create(0.2f);
 	auto action04 = Sequence::create(action03, CallFunc::create([&]{
 		//log("add child");

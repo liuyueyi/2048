@@ -20,6 +20,8 @@ public:
 
 	void setLocalPosition(int row, int column);
 
+	void initAction();
+	void moveOnly(int targetRow, int targetColumn);
 	void moveAndClear(int targetRow, int targetColumn);
 	void moveAndUpdate();
 
@@ -28,4 +30,10 @@ private:
 	void updateBg();
 	Label* _label;
 	LayerColor* _bg;
+};
+
+enum StateType{
+	SOLDIER, // 0
+	CLASSIC, // 1
+	COLOR // 2
 };
