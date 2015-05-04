@@ -179,8 +179,7 @@ void GameLayer::randGenGrid()
 	auto item = Grid::create();
 	item->initValue((int)(CCRANDOM_0_1()*2), row, column);
 	_grids[row][column] = item;
-	item->setScale(0);
-	item->runAction(ScaleTo::create(0.3f, 1));
+	item->initAction();
 	this->addChild(item);
 }
 
@@ -451,8 +450,8 @@ void GameLayer::moveOnly(int row, int column, int targetRow, int targetColumn)
 
 	saveLastGrids(); // 仅第一移动时，保存上一次的布局
 
-	auto action = MoveTo::create(0.1f, Vec2(73*targetColumn + 8, 73*targetRow+ 8));
-	_grids[row][column]->runAction(action);
+	//auto action = MoveTo::create(0.1f, Vec2(73*targetColumn + 8, 73*targetRow+ 8));
+	_grids[row][column]->moveOnly(targetRow, targetColumn);
 	_grids[targetRow][targetColumn] = _grids[row][column];
 	_grids[row][column] = nullptr;
 }
