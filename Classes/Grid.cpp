@@ -77,10 +77,7 @@ void Grid::loadMap()
 
 bool Grid::compareTo(Grid* grid)
 {
-	if(grid == nullptr)
-		return false;
-
-	return _value == grid->getScoreValue();
+	return grid!=nullptr && _value == grid->getScoreValue();
 }
 
 // init the first value of the grid, and the value should be 0 or 1
@@ -140,6 +137,18 @@ void Grid::moveAndUpdate()
 	this->runAction(action04);
 }
 
+//void Grid::moveAndUpdate(int targetRow, int targetColumn)
+//{
+//	auto a1 = MoveTo::create(0.2f, Vec2(73 * targetColumn + 8, 73 * targetRow + 8));
+//	auto a2 = CallFunc::create([&]{
+//		//log("remove child");
+//		this->updateValue(); // value++ and update bg
+//	});
+//	auto a3 = ScaleTo::create(0.1f, 1.1f);
+//	auto a4 = ScaleTo::create(0.1f, 1);
+//	auto a5 = Sequence::create(a1, a2, a4, a4, nullptr);
+//	this->runAction(a5);
+//}
 
 //void Grid::updateValue()
 //{
