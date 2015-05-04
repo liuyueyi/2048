@@ -13,7 +13,7 @@ public:
 	virtual bool init();
 
 	CC_SYNTHESIZE(int, _value, ScoreValue);
-	void updateValue();
+	//void updateValue();
 	void initValue(int value);
 	void initValue(int value, int row, int column);
 	bool compareTo(Grid* grid);

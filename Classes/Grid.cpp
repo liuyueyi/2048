@@ -128,13 +128,13 @@ void Grid::moveAndUpdate()
 }
 
 
-void Grid::updateValue()
-{
-	_value ++;
-	if(_value >= 19)
-		_value = 19;
-	updateBg();
-}
+//void Grid::updateValue()
+//{
+//	_value ++;
+//	if(_value >= 19)
+//		_value = 19;
+//	updateBg();
+//}
 
 void Grid::updateBg()
 {
