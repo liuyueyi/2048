@@ -365,7 +365,6 @@ int GameLayer::moveGrid(const int direction, int row, int column, int targetRow,
 bool GameLayer::moveToRight()
 {
 	auto target = 3;
-	auto preColumn = 0;
 	for(int row = 0; row < 4; row ++)
 	{
 		target = 3;
@@ -373,8 +372,8 @@ bool GameLayer::moveToRight()
 		{
 			if(_grids[row][column] == nullptr)
 				continue;
-			preColumn = moveGrid(Direction::LEFT, row, column, row, target);
-			if(preColumn == ERRORINDEX)
+			column = moveGrid(Direction::LEFT, row, column, row, target);
+			if(column == ERRORINDEX)
 				break;
 			target--;
 		}
@@ -385,7 +384,6 @@ bool GameLayer::moveToRight()
 bool GameLayer::moveToLeft()
 {
 	auto target = 0;
-	auto preColumn = 0;
 	for(int row = 0; row < 4; row++)
 	{
 		target = 0;
@@ -394,8 +392,8 @@ bool GameLayer::moveToLeft()
 			if(_grids[row][column] == nullptr)
 				continue;
 
-			preColumn = moveGrid(Direction::RIGHT, row, column, row, target);
-			if(preColumn == ERRORINDEX)
+			column = moveGrid(Direction::RIGHT, row, column, row, target);
+			if(column == ERRORINDEX)
 				break;
 			target ++;
 		}
@@ -406,7 +404,6 @@ bool GameLayer::moveToLeft()
 bool GameLayer::moveToTop()
 {
 	int target = 3;
-	int preRow = 0;
 	for(int column = 0; column < 4; column++)
 	{
 		target = 3;
@@ -414,8 +411,8 @@ bool GameLayer::moveToTop()
 		{
 			if(_grids[row][column] == nullptr)
 				continue;
-			preRow = moveGrid(Direction::DOWN, row, column, target, column);
-			if(preRow == ERRORINDEX)
+			row = moveGrid(Direction::DOWN, row, column, target, column);
+			if(row == ERRORINDEX)
 				break;
 			target --;
 		}
@@ -426,7 +423,6 @@ bool GameLayer::moveToTop()
 bool GameLayer::moveToBottom()
 {
 	int target = 0;
-	int preRow = 0;
 	for(int column = 0; column < 4; column++)
 	{
 		target = 0;
@@ -434,8 +430,8 @@ bool GameLayer::moveToBottom()
 		{
 			if(_grids[row][column] == nullptr)
 				continue;
-			preRow = moveGrid(Direction::UP, row, column, target, column);
-			if(preRow == ERRORINDEX)
+			row = moveGrid(Direction::UP, row, column, target, column);
+			if(row == ERRORINDEX)
 				break;
 			target ++;
 		}
