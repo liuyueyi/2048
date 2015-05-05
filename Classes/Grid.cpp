@@ -109,13 +109,13 @@ void Grid::initAction()
 
 void Grid::moveOnly(int targetRow, int targetColumn)
 {
-	runAction(MoveTo::create(0.2f, Vec2(73 * targetColumn + 8, 73 * targetRow + 8)));
+	runAction(MoveTo::create(0.1f, Vec2(73 * targetColumn + 8, 73 * targetRow + 8)));
 }
 
 void Grid::moveAndClear(int targetRow, int targetColumn)
 {
-	auto a1 = MoveTo::create(0.2f, Vec2(73 * targetColumn + 8, 73 * targetRow + 8));
-	auto a2 = FadeOut::create(0.2f);
+	auto a1 = MoveTo::create(0.1f, Vec2(73 * targetColumn + 8, 73 * targetRow + 8));
+	auto a2 = FadeOut::create(0.1f);
 	auto a3 = Spawn::create(a1, a2, nullptr);
 	auto a4 = CallFunc::create([&]{
 		//log("remove child");
@@ -129,7 +129,7 @@ void Grid::moveAndUpdate()
 	this->setVisible(false);
 	auto action01 = ScaleTo::create(0.1f, 1.1f);
 	auto action02 = ScaleTo::create(0.1f, 1);
-	auto action03 = FadeIn::create(0.2f);
+	auto action03 = FadeIn::create(0.1f);
 	auto action04 = Sequence::create(action03, CallFunc::create([&]{
 		//log("add child");
 		this->setVisible(true);
