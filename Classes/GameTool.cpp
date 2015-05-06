@@ -13,9 +13,10 @@ bool GameTool::init()
 {
 	do{
 		CC_BREAK_IF(!Layer::init());
+		auto designSize = Director::getInstance()->getOpenGLView()->getDesignResolutionSize();
 		// set tool layer's size and position
 		this->setContentSize(Size(300, 60));
-		this->setPosition(10, 410);
+		this->setPosition(10, 330 + 90*designSize.height / 480.0);
 
 		auto layerIcon = LayerColor::create(Color4B(230, 230, 0, 0), 100, 60);
 		auto label = Label::createWithSystemFont("2048+", "Arial", 36);

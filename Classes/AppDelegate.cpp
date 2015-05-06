@@ -9,17 +9,15 @@ AppDelegate::AppDelegate() {
 
 }
 
-AppDelegate::~AppDelegate() 
-{
+AppDelegate::~AppDelegate() {
 }
 
 //if you want a different context,just modify the value of glContextAttrs
 //it will takes effect on all platforms
-void AppDelegate::initGLContextAttrs()
-{
+void AppDelegate::initGLContextAttrs() {
 	//set OpenGL context attributions,now can only set six attributions:
 	//red,green,blue,alpha,depth,stencil
-	GLContextAttrs glContextAttrs = {8, 8, 8, 8, 24, 8};
+	GLContextAttrs glContextAttrs = { 8, 8, 8, 8, 24, 8 };
 
 	GLView::setGLContextAttrs(glContextAttrs);
 }
@@ -28,12 +26,31 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	// initialize director
 	auto director = Director::getInstance();
 	auto glview = director->getOpenGLView();
-	if(!glview) {
-		glview = GLViewImpl::createWithRect("2048", Rect(0, 0,320, 480));
+	if (!glview) {
+		glview = GLViewImpl::createWithRect("2048", Rect(0, 0, 480, 800));
 		director->setOpenGLView(glview);
 	}
-	glview->setFrameSize(320,480);
-	director->getOpenGLView()->setDesignResolutionSize(320, 480, ResolutionPolicy::SHOW_ALL);
+	glview->setFrameSize(480, 800);
+	/*director->getOpenGLView()->setDesignResolutionSize(320, 480,
+		ResolutionPolicy::NO_BORDER);*/
+
+	auto winSize =  director->getWinSize();
+	float deviceWidth = winSize.width;
+	float deviceHeight = winSize.height;
+	log("the device width and height is %f %f\n", deviceWidth, deviceHeight);
+
+	float designWidth = 320;
+	float designHeight = 480;
+
+	float scaleX = deviceWidth / designWidth;
+	float scaleY = deviceHeight / designHeight;
+	if (scaleX < scaleY) // ------------> Çø±ð´¦
+		designHeight = deviceHeight / scaleX;
+	else
+		designWidth = deviceWidth / scaleY;
+	log("the new design width and height is %f %f\n", designWidth, designHeight);
+	director->getOpenGLView()->setDesignResolutionSize(designWidth,
+			designHeight, ResolutionPolicy::SHOW_ALL);
 
 	// turn on display FPS
 	director->setDisplayStats(true);
@@ -56,10 +73,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
 // This function will be called when the app is inactive. When comes a phone call,it's be invoked too
 void AppDelegate::applicationDidEnterBackground() {
 	Director::getInstance()->stopAnimation();
-	
-	log("exit and save--->%s", Grid::getType());
-	DataConf::getInstance()->dumpData(Grid::getType());
 
+	log("exit and save--->%d", Grid::getType());
+	DataConf::getInstance()->dumpData(Grid::getType());
 
 	// if you use SimpleAudioEngine, it must be pause
 	// SimpleAudioEngine::getInstance()->pauseBackgroundMusic();

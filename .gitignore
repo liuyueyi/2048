@@ -2,3 +2,5 @@ cocos2d/
 proj.win32/Debug.win32
 proj.win32/2048.sdf
 proj.win32/2048.opensdf
+proj.android/obj
+proj.android/bin
