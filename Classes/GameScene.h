@@ -7,7 +7,7 @@ public:
 	static cocos2d::Scene* createScene();
 	static GameScene* getInstance();
 	virtual bool init();
-	
+
 private:
 	CREATE_FUNC(GameScene)
 };

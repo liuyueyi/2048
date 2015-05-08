@@ -17,4 +17,8 @@ private:
 	void soldierCallFunc(Ref* ref);
 	void soundCallFunc(Ref* ref);
 	void changeType(int newType);
+
+	void loadTitle();
+
+	Label* _modes[4];
 };

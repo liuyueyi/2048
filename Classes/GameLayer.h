@@ -25,6 +25,9 @@ public:
 	void onTouchMoved(Touch* touch, Event* event);
 	void onTouchEnded(Touch* touch, Event* event);
 
+	bool setMusic();
+	CC_SYNTHESIZE(bool, _isMusic, Music);
+
 	Grid* _grids[4][4];
 	int _lastGrids[4][4];
 
@@ -47,6 +50,7 @@ private:
 	void moveAndClear(int row, int column, int targetRow, int targetColumn);
 
 	bool ifOver();
+	void playMusic();
 
 	Vec2 _begin;
 	Vec2 _end;

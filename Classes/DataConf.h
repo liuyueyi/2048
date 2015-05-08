@@ -9,7 +9,9 @@ class DataConf:
 	public Ref
 {
 public:
-	static std::string* map;
+	static DataConf* _instance;
+	static const char* map[];
+	static const char* title[];
 
 	CREATE_FUNC(DataConf);
 	static DataConf* getInstance();

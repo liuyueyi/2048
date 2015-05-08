@@ -28,5 +28,27 @@ package org.cocos2dx.cpp;
 
 import org.cocos2dx.lib.Cocos2dxActivity;
 
+import android.util.Log;
+import android.view.KeyEvent;
+import android.widget.Toast;
+
 public class AppActivity extends Cocos2dxActivity {
+	private long exitTime = 0;
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event){
+		if(keyCode == KeyEvent.KEYCODE_BACK){
+			if(System.currentTimeMillis() - exitTime > 2000){
+				exitTime = System.currentTimeMillis();
+				Toast.makeText(this, "click again to exit game", Toast.LENGTH_LONG).show();
+				Log.d("2048", "show the exit tips");
+				return false;
+			} else
+			{
+				Log.d("2048", "exit game");
+				finish();
+				System.exit(0);
+			}
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 }

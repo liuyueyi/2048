@@ -10,7 +10,8 @@ bool MenuButton::init()
 
 MenuItem* MenuButton::getMenuItem(const std::string& text, const Size& size)
 {
-	auto label = Label::createWithSystemFont(text, "Airea", 26);
+	//auto label = Label::createWithSystemFont(text, "Airea", 26);
+	auto label = Label::createWithTTF(text, "fonts/helveticaneuebold.ttf", 24);
 	//label->setTextColor(Color4B(120,120,0, 255));
 
 	auto item = MenuItemLabel::create(label);

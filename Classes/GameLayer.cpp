@@ -1,6 +1,8 @@
+#include "GameScene.h"
 #include "GameLayer.h"
 #include "GameTool.h"
 #include "DataConf.h"
+#include "SimpleAudioEngine.h"
 
 GameLayer* GameLayer::_instance = nullptr;
 int isMove = 0; // 大于0时，表示移动了当前的数字布局，因此需要自动保存上一次的布局结果, 在移动完毕后在RandGenGrid中进行自动清0
@@ -17,8 +19,12 @@ bool GameLayer::init()
 	do{
 		CC_BREAK_IF(!Layer::init());
 
+		auto designSize = Director::getInstance()->getOpenGLView()->getDesignResolutionSize();
+
 		this->setContentSize(Size(300, 300));
-		this->setPosition(10, 65);
+		this->setPosition(Vec2(10, 75 * designSize.height / 480.0));
+
+		_isMusic = UserDefault::getInstance()->getBoolForKey("isMusic", true);
 
 		initBg();
 	}while(0);
@@ -65,9 +71,14 @@ void GameLayer::loadGrids(int type)
 {
 	_isOver = false;
 	auto f = UserDefault::getInstance();
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+	if(!f->getBoolForKey(Value(type).asString().append("exits").c_str(), false))
+		return initGrids();
+#else
 	if(!f->isXMLFileExist() || !f->getBoolForKey(Value(type).asString().append("exits").c_str(), false))
 		return initGrids();
-	
+#endif
+
 	int value = 0;
 	for(int i = 0; i < 4; i++)
 	{
@@ -124,11 +135,18 @@ void GameLayer::restartGame()
 
 void GameLayer::undoGame()
 {
-	if(_lastGrids[0][0] != DOUBLE_EMPTY) // 非初始化时，才能调用undo
+	if(_lastGrids[0][0] == DOUBLE_EMPTY) // 非初始化时，才能调用undo
+		return;
+
+	if(_isOver) // 游戏结束，允许后退一步来挽救
 	{
-		clearGrids();
-		recoverLastGrids();
+		auto fail = this->getChildByName("fail");
+		fail->setVisible(false);
+		_isOver = false;
 	}
+
+	clearGrids();
+	recoverLastGrids();
 }
 
 void GameLayer::saveLastGrids()
@@ -199,26 +217,39 @@ void GameLayer::onExit()
 	Layer::onExit();
 	/*log("eixt%d", DataConf::getInstance()->getModelType());*/
 	DataConf::getInstance()->dumpData(Grid::getType());
+	CocosDenshion::SimpleAudioEngine::getInstance()->end(); // free the audio resource
 }
 
 bool GameLayer::onTouchBegan(Touch* touch, Event* event)
 {
+	_begin = touch->getLocation();
+	if(!this->getBoundingBox().containsPoint(_begin)) // means only touch the game box, then response
+		return false;
+
 	if(_isOver)//if game over, then restart the game
 	{
 		auto fail = this->getChildByName("fail");
 		fail->setVisible(false);
+		//fail->removeFromParent();
 		restartGame();
 		return false;
 	}
+	// if set menu is visible, then close the set menu
+	auto layer = static_cast<GameScene*>(this->getParent());
+	auto setmenu = layer->getChildByName("setlayer");
+	if(setmenu->isVisible())
+	{
+		setmenu->setVisible(false);
+		return false;
+	}
 
-	_begin = touch->getLocation();
-	auto rect = Rect(this->getPosition().x, this->getPosition().y, this->getContentSize().width, this->getContentSize().height);
-	return rect.containsPoint(_begin); // means only touch the game box, then response
+	return true;
 }
 
 void GameLayer::onTouchMoved(Touch* touch, Event* event)
 {
 }
+static auto merged = false;
 void GameLayer::onTouchEnded(Touch* touch, Event* event)
 {
 	_end = touch->getLocation();
@@ -245,8 +276,10 @@ void GameLayer::onTouchEnded(Touch* touch, Event* event)
 	}
 
 	if(isMove > 0) // if moved, then add a new Grid item
+	{
 		randGenGrid();
-
+		playMusic();
+	}
 	// judge if game over
 	_isOver = ifOver();
 }
@@ -274,15 +307,19 @@ bool GameLayer::ifOver()
 		if(_grids[row][3] == nullptr || _grids[row][3]->compareTo(_grids[row+1][3]))
 			return false;
 
+	if(_grids[3][3] == nullptr)
+		return false;
+
 	// game over and show the fail scene
 	auto fail = this->getChildByName("fail");
 	if(fail == nullptr)
 	{
 		fail = LayerColor::create(Color4B(144, 144, 144, 144), 300, 300);
-		auto flabel = Label::create("Game Over!", "Bold", 50);
+		auto flabel = Label::createWithSystemFont("Game Over!", "Bold", 50);
 		flabel->setPosition(150, 150);
 		fail->addChild(flabel);
 		fail->setName("fail");
+		fail->setLocalZOrder(1000);
 		this->addChild(fail);
 	}
 	fail->setVisible(true);
@@ -350,6 +387,7 @@ int GameLayer::moveGrid(const int direction, int row, int column, int targetRow,
 
 	if(_grids[row][column]->compareTo(_grids[preRow][preCol])) // can merge two number
 	{
+		merged = true;
 		auto value = _grids[row][column]->getScoreValue();
 		moveAndClear(row, column, targetRow, targetColumn);
 		moveAndClear(preRow, preCol, targetRow, targetColumn);
@@ -467,4 +505,22 @@ void GameLayer::moveAndClear(int row, int column, int targetRow, int targetColum
 
 	_grids[row][column]->moveAndClear(targetRow, targetColumn);
 	_grids[row][column] = nullptr;
+}
+
+bool GameLayer::setMusic()
+{
+	_isMusic = !_isMusic;
+	return _isMusic;
+}
+
+void GameLayer::playMusic()
+{
+	if(!_isMusic)
+		return;
+
+	if(merged)
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("move.mp3"); // should play merge.mp3
+	else
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("move.mp3");
+	merged = false;
 }

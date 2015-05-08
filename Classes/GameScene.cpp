@@ -3,6 +3,7 @@
 #include "GameMenuLayer.h"
 #include "GameTool.h"
 #include "SetMenu.h"
+#include "DataConf.h"
 
 USING_NS_CC;
 
@@ -11,6 +12,7 @@ Scene* GameScene::createScene()
 	auto scene = Scene::create();
 	auto layer = GameScene::getInstance();
 	scene->addChild(layer);
+
 	return scene;
 }
 
@@ -43,5 +45,23 @@ bool GameScene::init()
 	setLayer->setVisible(false);
 	this->addChild(setLayer);
 
+	auto listener = EventListenerKeyboard::create();
+	listener->onKeyReleased = [&](EventKeyboard::KeyCode keyCode, Event* event)
+	{
+		if(keyCode == EventKeyboard::KeyCode::KEY_A || keyCode == EventKeyboard::KeyCode::KEY_BACKSPACE
+				||  keyCode == EventKeyboard::KeyCode::KEY_BACK)
+		{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+			log("exit and save the game");
+			DataConf::getInstance()->dumpData(Grid::getType());
+#else
+			Director::getInstance()->end();
+#endif
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+			exit(0);
+#endif
+		}
+	};
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 	return true;
 }

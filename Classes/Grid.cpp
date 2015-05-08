@@ -1,13 +1,19 @@
 #include "Grid.h"
 #include "GameTool.h"
 #include "GameLayer.h"
+#include "DataConf.h"
+#include "json/document.h"
+#include "json/writer.h"
+#include "json/stringbuffer.h"
 
-//static std::string map[] = {"2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768", "65536",  "131072", "262144", "524288"};
-std::string map[16] = {"0"};
-std::string guan[] = {"小兵", "下士", "中士", "上士", "少尉", "中尉", "上尉", "少校", "中校", "上校", "大校", "准将", "少将", "中将", "上将", "元帅"};
-std::string num[] = {"2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768", "65536",  "131072", "262144", "524288"};
+std::string map[4][16] = {
+	{ "10", "11", "!2", "13", "14", "15", "16" ,"17", "18", "19", "20", "21", "22", "23", "24", "25"},
+	{"2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768", "65536"},
+	{"", "","","","","","","","","","","","","","",""},
+	{"0"}
+};
 
-static int type = 0;
+static int type = -1;
 void Grid::changeType(int _type)
 {
 	type = _type;
@@ -17,42 +23,26 @@ void Grid::changeType(int _type)
 
 int Grid::getType()
 {
+	if(type == -1)
+	{
+		type = UserDefault::getInstance()->getIntegerForKey("type", 0);
+		map[3][0] = "1";
+	}
 	return type;
-}
-#ifndef CP_ACP
-#define CP_ACP 0
-#endif
-#ifndef CP_UTF8
-#define CP_UTF8 1
-#endif
-const char* Grid::G2U(const char* gb2312)
-{
-	//int len = MultiByteToWideChar(CP_ACP, 0, gb2312, -1, NULL, 0);
-	//wchar_t* wstr = new wchar_t[len+1];
-	//memset(wstr, 0, len+1);
-	//MultiByteToWideChar(CP_ACP, 0, gb2312, -1, wstr, len);
-	//len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
-	//char* str = new char[len+1];
-	//memset(str, 0, len+1);
-	//WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, len, NULL, NULL);
-	//if(wstr) delete[] wstr;
-	//return str;
-	return gb2312;
 }
 
 bool Grid::init()
 {
 	if(!Layer::init())
 		return false;
-	
+
 	loadMap();
 
 	this->setContentSize(Size(65, 65));
 	_value = 0;
 	_bg = LayerColor::create(Color4B(213, 205, 194, 255), 65, 65);
-	//_bg->setAnchorPoint(Vec2(32.5f, 32.5f));
-	_label = Label::createWithSystemFont(map[_value], "Arial", 30);
-	//_label = Label::createWithTTF(map[_value], "MarkerFelt.ttf", 30);
+	_label = Label::createWithSystemFont(map[type][_value], "Arial", 30);
+//	_label = Label::createWithTTF(map[type][_value], "treb.ttf", 30);
 	_label->setPosition(32.5f, 32.5f);
 	this->addChild(_bg);
 	this->addChild(_label);
@@ -64,22 +54,56 @@ bool Grid::init()
 
 void Grid::loadMap()
 {
-	
-	if(map[0].compare("0") == 0) // 首次时，装载显示对象
+	if(map[3][0] == "0") // 首次时，装载显示对象
 	{
 		type = UserDefault::getInstance()->getIntegerForKey("type", 0);
+		map[3][0] = "1";
+	}
+	if(type == StateType::SOLDIER && map[0][0] == "10")
+		loadSoldier();
+}
+
+void Grid::loadSoldier()
+{
+	auto path = "data.json";
+	rapidjson::Document document;
+	bool bRect = false;
+	ssize_t size = 0;
+	std::string load_str;
+
+	// read text from json file
+	unsigned char* titlech = FileUtils::getInstance()->getFileData(path, "r", &size);
+	load_str = std::string((const char*)titlech, size);
+
+	document.Parse<0>(load_str.c_str());
+	if(document.HasParseError()) // print the load error
+		log("get parse error%s\n", document.GetParseError());
+
+	if(!document.IsObject())
+	{
+		log("not object, so error\n");
+		return ;
 	}
 
-	for(int i = 0; i<16; i++)
+	char * keys[]= { "10", "11", "!2", "13", "14", "15", "16" ,"17", "18", "19", "20", "21", "22", "23", "24", "25"};
+	rapidjson::Value& _array = document["array"];
+	int i = 0;
+	if(!_array.IsArray())
+		return;
+
+	for(int i = 0; i < _array.Capacity(); i++)
 	{
-		if(type == StateType::SOLDIER)
-			map[i] = Grid::G2U(guan[i].c_str());
-		else if(type == StateType::CLASSIC)
-			map[i] = num[i];
-		else if(type == StateType::COLOR)
-			map[i] = "";
+		rapidjson::Value& arraydoc = _array[i];
+		for(auto key : keys)
+		{
+			if(arraydoc.HasMember(key))
+			{
+				map[0][i++] = arraydoc[key].GetString();
+			}
+		}
 	}
 }
+
 
 bool Grid::compareTo(Grid* grid)
 {
@@ -120,8 +144,8 @@ void Grid::moveOnly(int targetRow, int targetColumn)
 
 void Grid::moveAndClear(int targetRow, int targetColumn)
 {
-	auto a1 = MoveTo::create(0.1f, Vec2(73 * targetColumn + 8, 73 * targetRow + 8));
-	auto a2 = FadeOut::create(0.1f);
+	auto a1 = MoveTo::create(0.13f, Vec2(73 * targetColumn + 8, 73 * targetRow + 8));
+	auto a2 = FadeOut::create(0.13f);
 	auto a3 = Spawn::create(a1, a2, nullptr);
 	auto a4 = CallFunc::create([&]{
 		//log("remove child");
@@ -135,7 +159,7 @@ void Grid::moveAndUpdate()
 	this->setVisible(false);
 	auto action01 = ScaleTo::create(0.1f, 1.1f);
 	auto action02 = ScaleTo::create(0.1f, 1);
-	auto action03 = FadeIn::create(0.1f);
+	auto action03 = FadeIn::create(0.13f);
 	auto action04 = Sequence::create(action03, CallFunc::create([&]{
 		//log("add child");
 		this->setVisible(true);
@@ -166,7 +190,8 @@ void Grid::moveAndUpdate()
 
 void Grid::updateBg()
 {
-	_label->setString(map[_value]);
+	_label->setString(map[type][_value]);
+	//log("the content is --->%d %d %s\n", type, _value, map[0][1]);
 	Color3B color, fcolor = Color3B(255, 255, 255);
 
 	switch(_value)
@@ -224,7 +249,7 @@ void Grid::updateBg()
 	}
 	_label->setColor(fcolor);
 	_bg->setColor(color);
-	
+
 	if(type != 1)
 		return;
 

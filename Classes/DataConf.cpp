@@ -1,14 +1,21 @@
 #include "DataConf.h"
 #include "GameTool.h"
 #include "GameLayer.h"
+#include "json/document.h"
+#include "json/stringbuffer.h"
+#include "json/rapidjson.h"
+#include "json/writer.h"
 
-static DataConf* instance;
+const char* DataConf::map[] = { "10", "11", "!2", "13", "14", "15", "16" ,"17", "18", "19", "20", "21", "22", "23", "24", "25"};
+const char* DataConf::title[] = {"sound_on", "sound_off", "classic", "color", "soldier"};
+
+DataConf* DataConf::_instance = nullptr;
 DataConf* DataConf::getInstance()
 {
-	if(instance == nullptr)
-		instance = create();
+	if(_instance == nullptr)
+		_instance = create();
 
-	return instance;
+	return _instance;
 }
 
 bool DataConf::init()
@@ -16,21 +23,6 @@ bool DataConf::init()
 	return true;
 }
 
-//void DataConf::loadMap()
-//{
-//	extern std::string map[16];
-//	auto all = FileUtils::getInstance()->getValueMapFromFile("data.plist");
-//	auto type = all.at("type").asInt();
-//	log("the type is %d\n", type);
-//
-//	for(int i = 0; i < 16; i++)
-//	{
-//		if(type == 0)
-//			map[i] = "";
-//		else
-//			map[i] = all.at(Value(type+i).asString()).asString();
-//	}
-//}
 
 void DataConf::dumpData(int type)
 {
@@ -39,7 +31,8 @@ void DataConf::dumpData(int type)
 	f->setIntegerForKey(Value(type).asString().append("best_score").c_str(), GameTool::getInstance()->getBestScore());
 	f->setIntegerForKey("type", type);
 	f->setBoolForKey(Value(type).asString().append("exits").c_str(), true);
-	f->flush();
+	log("save type exits %d %d", type, f->getBoolForKey(Value(type).asString().append("exits").c_str(), false));
+	//	f->flush();
 
 	Grid* temp;
 	int value;
@@ -57,4 +50,5 @@ void DataConf::dumpData(int type)
 		}
 	}
 	f->flush();
+	log("dump the data for type: %d\n", type);
 }

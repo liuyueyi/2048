@@ -6,7 +6,6 @@ USING_NS_CC;
 class Grid:public cocos2d::Layer
 {
 public:
-	static char* G2U(const char* gb2312);
 	static void changeType(int type);
 	static int getType();
 	CREATE_FUNC(Grid);
@@ -25,7 +24,10 @@ public:
 	void moveAndClear(int targetRow, int targetColumn);
 	void moveAndUpdate();
 
+	static const char* guan[];
+
 private:
+	void loadSoldier();
 	void loadMap();
 	void updateBg();
 	Label* _label;
